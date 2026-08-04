@@ -17,7 +17,13 @@
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.cafeJournalApp",
+      "config": {
+        "googleMaps" : {
+          "apiKey": "process.env.EXPO_PUBLIC_GOOGLE_MAP_API"
+        }
+      }
     },
     "web": {
       "output": "static",
@@ -33,6 +39,12 @@
             "image": "./assets/images/splash-icon.png",
             "imageWidth": 76
           }
+        }
+      ],
+      [
+        "react-native-maps",
+        {
+          "androidGoogleMapsApiKey": "process.env.EXPO_PUBLIC_GOOGLE_MAP_API"
         }
       ]
     ],
