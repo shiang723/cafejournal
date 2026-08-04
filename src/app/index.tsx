@@ -1,98 +1,124 @@
-import * as Device from 'expo-device';
-import { Platform, StyleSheet } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import SearchBar from '@/components/searchBar';
+import { auth } from '@/config/firebaseConfig';
+import { fetchJournals } from '@/config/firebaseHandlers';
+import { router, useIsFocused } from "expo-router";
+import { onAuthStateChanged } from 'firebase/auth';
+import { useEffect, useState } from 'react';
+import { StyleSheet, Text, View } from "react-native";
+import MapView, { Callout, LatLng, Marker, PROVIDER_GOOGLE } from 'react-native-maps';
+import { PERMISSIONS, request, RESULTS } from 'react-native-permissions';
 
-import { AnimatedIcon } from '@/components/animated-icon';
-import { HintRow } from '@/components/hint-row';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { WebBadge } from '@/components/web-badge';
-import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
+export default function Index() {
+  const [location, setLocation] = useState<LatLng | null>();
+  const [locationPermission, setLocationPermission] = useState<Boolean>(false)
+  const [userJournals, setUserJournals] = useState<Array<{ id: string;[key: string]: unknown }>>([]);
+  const isFocused = useIsFocused();
+  const [user, setUser] = useState<any | null>(null)
 
-function getDevMenuHint() {
-  if (Platform.OS === 'web') {
-    return <ThemedText type="small">use browser devtools</ThemedText>;
-  }
-  if (Device.isDevice) {
-    return (
-      <ThemedText type="small">
-        shake device or press <ThemedText type="code">m</ThemedText> in terminal
-      </ThemedText>
-    );
-  }
-  const shortcut = Platform.OS === 'android' ? 'cmd+m (or ctrl+m)' : 'cmd+d';
+  request(PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION).then((status) => {
+    switch (status) {
+      case RESULTS.UNAVAILABLE:
+        return console.log('This feature is not available (on this device / in this context)');
+      case RESULTS.DENIED:
+        return console.log('The permission has not been requested / is denied but requestable');
+      case RESULTS.BLOCKED:
+        return console.log('The permission is denied and not requestable');
+      case RESULTS.GRANTED:
+        setLocationPermission(true);
+        return console.log('The permission is granted');
+      case RESULTS.LIMITED:
+        return console.log('The permission is granted but with limitations');
+    }
+  });
+
+
+  useEffect(() => {
+    const authChange = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setUser(user);
+      } else {
+        setUser(null);
+        console.log('No user found');
+      }
+    });
+    return () => authChange();
+  }, []);
+  useEffect(() => {
+    async function getCurrentLocation() {
+
+      if (locationPermission) {
+        return
+      }
+      setLocation(location);
+    }
+    getCurrentLocation();
+
+    if (isFocused) {
+      const loadJournals = async () => {
+        const journals = await fetchJournals();
+        setUserJournals(journals ?? []);
+      };
+      loadJournals();
+    }
+
+  }, [isFocused]);
   return (
-    <ThemedText type="small">
-      press <ThemedText type="code">{shortcut}</ThemedText>
-    </ThemedText>
+    <View style={styles.container}>
+      <MapView style={styles.map}
+        provider={PROVIDER_GOOGLE}
+        showsUserLocation={true}
+        initialRegion={{
+          latitude: 49.310441,
+          longitude: -123.080884,
+          latitudeDelta: 0.05,
+          longitudeDelta: 0.05
+        }}
+        mapPadding={{
+          top: 700,
+          right: 0,
+          left: 0,
+          bottom: 0
+        }
+        }>
+        {
+          (user?.uid) ?
+            userJournals.map((entry) => {
+              return (
+                <Marker
+                  key={entry.id}
+                  tracksViewChanges={true}
+                  coordinate={{ longitude: Number(entry.location.details.location.longitude), latitude: Number(entry.location.details.location.latitude) }}
+                >
+                  <Callout style={{ width: 250, padding: 10 }}
+                    onPress={() => {
+                      router.navigate({
+                        pathname: '/journals/[id]',
+                        params: { id: String(entry?.id) }
+                      })
+                    }}>
+                    <View >
+                      <Text style={{ fontWeight: 'bold' }}>{String(entry.title)}</Text>
+                      <Text>{entry.location.text.text + "\nDate: " + String(entry.date.toDate())}</Text>
+                    </View>
+                  </Callout>
+                </Marker>
+              );
+            })
+            : null}
+      </MapView>
+      <SearchBar handlePlaceSelect={(placeData) => { setLocation(placeData.location.location) }} />
+
+    </View >
   );
 }
 
-export default function HomeScreen() {
-  return (
-    <ThemedView style={styles.container}>
-      <SafeAreaView style={styles.safeArea}>
-        <ThemedView style={styles.heroSection}>
-          <AnimatedIcon />
-          <ThemedText type="title" style={styles.title}>
-            Welcome to&nbsp;Expo
-          </ThemedText>
-        </ThemedView>
-
-        <ThemedText type="code" style={styles.code}>
-          get started
-        </ThemedText>
-
-        <ThemedView type="backgroundElement" style={styles.stepContainer}>
-          <HintRow
-            title="Try editing"
-            hint={<ThemedText type="code">src/app/index.tsx</ThemedText>}
-          />
-          <HintRow title="Dev tools" hint={getDevMenuHint()} />
-          <HintRow
-            title="Fresh start"
-            hint={<ThemedText type="code">npm run reset-project</ThemedText>}
-          />
-        </ThemedView>
-
-        {Platform.OS === 'web' && <WebBadge />}
-      </SafeAreaView>
-    </ThemedView>
-  );
-}
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    flexDirection: 'row',
   },
-  safeArea: {
-    flex: 1,
-    paddingHorizontal: Spacing.four,
-    alignItems: 'center',
-    gap: Spacing.three,
-    paddingBottom: BottomTabInset + Spacing.three,
-    maxWidth: MaxContentWidth,
-  },
-  heroSection: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    flex: 1,
-    paddingHorizontal: Spacing.four,
-    gap: Spacing.four,
-  },
-  title: {
-    textAlign: 'center',
-  },
-  code: {
-    textTransform: 'uppercase',
-  },
-  stepContainer: {
-    gap: Spacing.three,
-    alignSelf: 'stretch',
-    paddingHorizontal: Spacing.three,
-    paddingVertical: Spacing.four,
-    borderRadius: Spacing.four,
+  map: {
+    width: '100%',
+    height: '100%',
   },
 });
