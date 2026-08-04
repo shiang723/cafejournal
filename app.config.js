@@ -1,4 +1,5 @@
-{
+
+module.exports = {
   "expo": {
     "name": "cafejournal",
     "slug": "cafejournal",
@@ -11,13 +12,21 @@
       "icon": "./assets/expo.icon"
     },
     "android": {
+      "permissions": ["android.permission.ACCESS_FINE_LOCATION"],
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
-      "predictiveBackGestureEnabled": false
+
+      "predictiveBackGestureEnabled": false,
+      "package": "com.cafeJournalApp",
+      "config": {
+        "googleMaps": {
+          "apiKey": process.env.EXPO_PUBLIC_GOOGLE_MAP_API
+        }
+      }
     },
     "web": {
       "output": "static",
@@ -34,6 +43,12 @@
             "imageWidth": 76
           }
         }
+      ],
+      [
+        "react-native-maps",
+        {
+          "androidGoogleMapsApiKey": process.env.EXPO_PUBLIC_GOOGLE_MAP_API
+        }
       ]
     ],
     "experiments": {
@@ -41,4 +56,5 @@
       "reactCompiler": true
     }
   }
-}
+};
+
