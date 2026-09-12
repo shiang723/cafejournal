@@ -2,6 +2,12 @@ import { handleLogin, handleSignUp } from '@/config/firebaseHandlers';
 import { useState } from 'react';
 import { Button, StyleSheet, Text, TextInput, View } from 'react-native';
 
+/**
+ * A sign in and sign up component.
+ * @version 1.0
+ * @author Hannah Shiang
+ * @returns Sign in, Sign up component.
+ */
 export default function SignInSignUp() {
 
     const [username, onChangeUsername] = useState('');
@@ -84,6 +90,7 @@ export default function SignInSignUp() {
     );
 };
 
+// Style sheet for component.
 const styles = StyleSheet.create({
     auth: {
         backgroundColor: 'lavenderblush',

@@ -2,10 +2,19 @@ import { useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import GooglePlacesTextInput, { Place } from 'react-native-google-places-textinput';
 
+/**
+ * Location search bar. Limited to cafe, bakery, and restaurants.
+ * @version 1.0
+ * @author Hannah Shiang
+ * @param handlePlaceSelect function for how to use the location information.
+ * @param oldLocation the location selected, if exists.
+ * @returns A Location search bar.
+ */
 export default function SearchBar({ handlePlaceSelect, oldLocation }: { handlePlaceSelect: (place: any) => void; oldLocation?: any }) {
 
     const [location, setLocation] = useState('')
 
+    // Get the text representation of the location.
     const getLocationText = (place?: any) => {
         return place?.structuredFormat?.mainText?.text
             ?? place?.text?.text
@@ -13,6 +22,7 @@ export default function SearchBar({ handlePlaceSelect, oldLocation }: { handlePl
             ?? '';
     };
 
+    // Load selected location, if exists.
     useEffect(() => {
         if (oldLocation) {
             setLocation(getLocationText(oldLocation))
@@ -37,6 +47,7 @@ export default function SearchBar({ handlePlaceSelect, oldLocation }: { handlePl
     )
 };
 
+// Style sheet for component.
 const styles = StyleSheet.create({
     container: {
         borderColor: 'black',

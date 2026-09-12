@@ -8,6 +8,11 @@ import { StyleSheet, Text, View } from "react-native";
 import MapView, { Callout, LatLng, Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import { PERMISSIONS, request, RESULTS } from 'react-native-permissions';
 
+/**
+ * Index is the main page of the app with a Map view along with a search bar.
+ * @version 1.0
+ * @author Hannah Shiang
+ */
 export default function Index() {
   const [location, setLocation] = useState<LatLng | null>();
   const [locationPermission, setLocationPermission] = useState<Boolean>(false)
@@ -15,6 +20,7 @@ export default function Index() {
   const isFocused = useIsFocused();
   const [user, setUser] = useState<any | null>(null)
 
+  // Ask user for location permission.
   request(PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION).then((status) => {
     switch (status) {
       case RESULTS.UNAVAILABLE:
@@ -32,6 +38,7 @@ export default function Index() {
   });
 
 
+  // Check if user is logged in.
   useEffect(() => {
     const authChange = onAuthStateChanged(auth, (user) => {
       if (user) {
@@ -43,6 +50,8 @@ export default function Index() {
     });
     return () => authChange();
   }, []);
+
+  // Get current location of user and load user's journals.
   useEffect(() => {
     async function getCurrentLocation() {
 
@@ -62,6 +71,8 @@ export default function Index() {
     }
 
   }, [isFocused]);
+
+
   return (
     <View style={styles.container}>
       <MapView style={styles.map}
@@ -112,7 +123,7 @@ export default function Index() {
   );
 }
 
-
+// Style for page.
 const styles = StyleSheet.create({
   container: {
     flex: 1,
