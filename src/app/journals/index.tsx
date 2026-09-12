@@ -6,11 +6,18 @@ import { onAuthStateChanged } from "firebase/auth";
 import { useEffect, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
+/**
+ * Journal List page with option to add journal and view existing entries.
+ * @version 1.0
+ * @author Hannah Shiang
+ * @returns Page of a list of user's journals.
+ */
 export default function Journals() {
     const [userJournals, setUserJournals] = useState<Array<{ id: string;[key: string]: unknown }>>([]);
     const isFocused = useIsFocused();
     const [user, setUser] = useState<any | null>(null)
 
+    // Check if user is logged in.
     useEffect(() => {
         const authChange = onAuthStateChanged(auth, (user) => {
             if (user) {
@@ -23,6 +30,7 @@ export default function Journals() {
         return () => authChange();
     }, []);
 
+    // Load user journal entries.
     useEffect(() => {
         if (isFocused) {
             const loadJournals = async () => {
@@ -73,6 +81,8 @@ export default function Journals() {
     )
 }
 
+
+// Style sheet for page.
 const styles = StyleSheet.create({
     page: {
         flex: 1

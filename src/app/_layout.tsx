@@ -1,7 +1,7 @@
 import Feather from '@expo/vector-icons/Feather';
 import { Tabs } from "expo-router";
 
-
+// Layout for app pages. Customizes the navigation and page styles.
 export default function RootLayout() {
   return (
     <Tabs screenOptions={{ tabBarActiveTintColor: 'pink' }}>

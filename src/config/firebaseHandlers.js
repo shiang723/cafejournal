@@ -2,7 +2,12 @@ import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } f
 import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, orderBy, query, Timestamp, updateDoc, where } from "firebase/firestore"
 import { auth, db } from "./firebaseConfig"
 
+/**
+ * Functions that uses/access firestore database, firebase function, or firestore function.
+ */
+
 //References code from https://medium.com/@mmusaib/setting-up-firebase-authentication-in-react-native-expo-2024-25-235a1258b53d
+// handle user login.
 export const handleLogin = (email, password) => {
     if (email == "" || password == '') {
         return alert('Email and password are required')
@@ -13,6 +18,7 @@ export const handleLogin = (email, password) => {
     })
 }
 
+// handle user sign up.
 export const handleSignUp = async (username, email, password) => {
     if (email == "" || password == '') {
         return alert('Email and password are required')
@@ -33,13 +39,13 @@ export const handleSignUp = async (username, email, password) => {
 
 }
 
+// handle user sign out.
 export const handleSignOut = () => {
     signOut(auth).then(() => console.log('User signed out!'));
 }
 
 
-
-
+// handle adding journal entry to user document.
 export const handleAddJournal = async (title, location, entry) => {
     const user = auth.currentUser;
     if (user) {
@@ -68,6 +74,7 @@ export const handleAddJournal = async (title, location, entry) => {
     }
 }
 
+// fetch user's journal entries.
 export async function fetchJournals() {
     const user = auth.currentUser;
     if (user) {
@@ -92,6 +99,7 @@ export async function fetchJournals() {
     return []
 }
 
+// fetch one user journal entry.
 export async function fetchJournalEntry(journalID) {
     const user = auth.currentUser;
     if (user) {
@@ -121,6 +129,7 @@ export async function fetchJournalEntry(journalID) {
     return []
 }
 
+// delete given journal entry.
 export async function deleteEntry(journalID) {
     const user = auth.currentUser;
     if (user) {
@@ -135,6 +144,7 @@ export async function deleteEntry(journalID) {
     }
 }
 
+// update given journal entry.
 export async function updateEntry(journalID, title, location, entry) {
     const user = auth.currentUser;
     if (user) {

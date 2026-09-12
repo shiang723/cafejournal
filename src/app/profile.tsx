@@ -5,10 +5,18 @@ import { onAuthStateChanged } from "firebase/auth";
 import { useEffect, useState } from 'react';
 import { Button, StyleSheet, Text, View } from "react-native";
 
+/**
+ * Profile page that displays user information and sign out button.
+ * If no user logged in, shows sign in or sign up options.
+ * @version 1.0
+ * @author Hannah Shiang
+ * @returns Profile page for user
+ */
 export default function Profile() {
 
     const [user, setUser] = useState<any | null>(null)
 
+    // Check if user is logged in.
     useEffect(() => {
         const authChange = onAuthStateChanged(auth, (user) => {
             if (user) {
@@ -21,7 +29,6 @@ export default function Profile() {
         return () => authChange();
     }, []);
 
-    // Render based on whether user is null
     return (
         <View>
             {user?.uid ?
@@ -36,6 +43,8 @@ export default function Profile() {
         </View>
     )
 }
+
+//Style sheet for page.
 const styles = StyleSheet.create({
     auth: {
         backgroundColor: 'lavenderblush',
